@@ -1,9 +1,7 @@
+import Puzzle from './views/Puzzle'
+
 function App() {
-	return (
-		<>
-			<p>Hello, World!</p>
-		</>
-	)
+	return <Puzzle />
 }
 
 export default App

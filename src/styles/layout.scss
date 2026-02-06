@@ -1,1 +1,15 @@
-/* layout styles */
+#root {
+	flex-grow: 1;
+}
+
+.puzzle {
+	display: flex;
+	flex-direction: column;
+	margin: 0 auto;
+	width: 100%;
+
+	header {
+		padding: 24px 0 0;
+		text-align: center;
+	}
+}

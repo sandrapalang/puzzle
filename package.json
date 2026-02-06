@@ -7,6 +7,7 @@
 		"dev": "vite",
 		"build": "tsc -b && vite build",
 		"lint": "eslint .",
+		"lint:html": "html-validate index.html",
 		"lint:styles": "stylelint 'src/**/*.{css,scss}'",
 		"lint:styles:fix": "stylelint 'src/**/*.{css,scss}' --fix",
 		"preview": "vite preview"
@@ -28,6 +29,7 @@
 		"eslint-plugin-react-hooks": "7.0.1",
 		"eslint-plugin-react-refresh": "0.4.24",
 		"globals": "^16.5.0",
+		"html-validate": "10.7.0",
 		"prettier": "3.8.1",
 		"sass": "1.97.3",
 		"stylelint": "17.1.1",

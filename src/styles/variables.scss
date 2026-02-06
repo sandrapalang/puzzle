@@ -1,1 +1,21 @@
-/* design tokens and variables */
+:root {
+	--color-accent-smoke: #ebebeb;
+	--color-accent-whitesmoke: whitesmoke;
+	--color-bg-primary: #fdfcf8;
+	--color-bg-secondary: #f1f0ed;
+	--color-bg-tertiary: #e5e4df;
+	--color-bg-quaternary: #cccbc6;
+	--color-bg-primary-alpha: rgb(121 120 115 / 29%);
+	--color-bg-secondary-alpha: rgb(121 120 125 / 16%);
+	--color-bg-tertiary-alpha: rgb(121 120 125 / 12%);
+	--color-bg-quaternary-alpha: rgb(121 120 125 / 8%);
+	--color-text-primary: #191919;
+	--color-text-secondary: #66645f;
+	--color-text-tertiary: #898782;
+	--color-text-quaternary: #a6a4a2;
+	--color-text-primary-alpha: rgb(29 29 29 / 69%);
+	--color-text-secondary-alpha: rgb(29 29 29 / 59%);
+	--color-text-tertiary-alpha: rgb(29 29 29 / 49%);
+	--color-text-quaternary-alpha: rgb(29 29 29 / 29%);
+	--box-shadow: rgb(0 0 0 / 15%);
+}

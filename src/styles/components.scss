@@ -1,1 +1,56 @@
-/* component styles */
+.board {
+	&-frame {
+		background-color: var(--color-accent-whitesmoke);
+		border-radius: 32px;
+		margin: 0 auto;
+		max-width: 640px;
+		padding: 18px;
+		width: 100%;
+	}
+
+	&-surface {
+		background-color: var(--color-bg-tertiary-alpha);
+		border-radius: 18px;
+		height: 100%;
+		padding: 8px;
+		width: 100%;
+	}
+
+	&-grid {
+		display: flex;
+		flex-direction: column;
+		gap: 8px;
+		width: 100%;
+	}
+
+	&-row {
+		display: flex;
+		gap: 8px;
+	}
+}
+
+.tile {
+	align-items: center;
+	aspect-ratio: 1;
+	background-color: var(--color-accent-whitesmoke);
+	border: none;
+	border-radius: 12px;
+	box-shadow: 0 2px 4px var(--box-shadow);
+	color: var(--color-text-secondary-alpha);
+	cursor: pointer;
+	display: flex;
+	font-size: 24px;
+	justify-content: center;
+	overflow: hidden;
+	width: 100%;
+
+	&-empty {
+		background-color: transparent;
+		box-shadow: none;
+		cursor: default;
+	}
+
+	&:not(.tile-empty):hover {
+		background-color: var(--color-accent-smoke);
+	}
+}

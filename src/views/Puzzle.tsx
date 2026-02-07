@@ -1,8 +1,7 @@
 import Board from '../components/Board'
+import { rows, columns } from '../config'
 
 const EMPTY = 0
-const rows = 3
-const columns = 3
 
 // Board construction (initial state & representation)
 function createSolvedTilesArray(rows: number, columns: number): number[] {

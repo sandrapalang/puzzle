@@ -11,10 +11,10 @@ function createSolvedTilesArray(rows: number, columns: number): number[] {
 	return tilesArray
 }
 
-function toMatrix(tiles: number[], columns: number): number[][] {
+function toMatrix(tilesArray: number[], columns: number): number[][] {
 	const matrix: number[][] = []
-	for (let i = 0; i < tiles.length; i += columns) {
-		matrix.push(tiles.slice(i, i + columns))
+	for (let i = 0; i < tilesArray.length; i += columns) {
+		matrix.push(tilesArray.slice(i, i + columns))
 	}
 	return matrix
 }

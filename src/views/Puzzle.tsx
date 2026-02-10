@@ -2,6 +2,8 @@ import { useState } from 'react'
 import Board from '../components/Board'
 import { rows, columns } from '../config'
 
+type GameStatus = 'playing' | 'won'
+
 const EMPTY = 0
 
 // Board construction (initial state & representation)
@@ -99,16 +101,27 @@ function shuffleByRandomMoves(
 	return nextTilesArray
 }
 
+// Game rules (win condition)
+function isPuzzleSolved(tiles: number[]): boolean {
+	for (let i = 0; i < tiles.length - 1; i++) {
+		if (tiles[i] !== i + 1) return false
+	}
+	return tiles[tiles.length - 1] === EMPTY
+}
+
 function Puzzle() {
 	const [tilesArray, setTilesArray] = useState<number[]>(() => {
 		const solvedTilesArray = createSolvedTilesArray(rows, columns)
 		return shuffleByRandomMoves(solvedTilesArray, rows, columns)
 	})
+	const [gameStatus, setGameStatus] = useState<GameStatus>('playing')
 
 	const tilesMatrix = toMatrix(tilesArray, columns)
 	const emptyTileIndex = tilesArray.indexOf(EMPTY)
 
 	const handleTileClick = (row: number, column: number) => {
+		if (gameStatus === 'won') return
+
 		const clickedTileIndex = toIndex(row, column, columns)
 		if (clickedTileIndex === emptyTileIndex) return
 
@@ -125,6 +138,10 @@ function Puzzle() {
 			emptyTileIndex,
 		)
 		setTilesArray(nextTilesArray)
+
+		if (isPuzzleSolved(nextTilesArray)) {
+			setGameStatus('won')
+		}
 	}
 
 	return (
@@ -135,6 +152,13 @@ function Puzzle() {
 			<main>
 				<Board tiles={tilesMatrix} onTileClick={handleTileClick} />
 			</main>
+			<footer>
+				{gameStatus === 'won' && (
+					<p className="puzzle-win" role="status">
+						du vann!
+					</p>
+				)}
+			</footer>
 		</div>
 	)
 }

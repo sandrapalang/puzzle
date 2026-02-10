@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import Board from '../components/Board'
 import { rows, columns } from '../config'
 
@@ -99,13 +100,31 @@ function shuffleByRandomMoves(
 }
 
 function Puzzle() {
-	const tilesArray = createSolvedTilesArray(rows, columns)
-	const shuffledTilesArray = shuffleByRandomMoves(tilesArray, rows, columns)
-	const tilesMatrix = toMatrix(shuffledTilesArray, columns)
+	const [tilesArray, setTilesArray] = useState<number[]>(() => {
+		const solvedTilesArray = createSolvedTilesArray(rows, columns)
+		return shuffleByRandomMoves(solvedTilesArray, rows, columns)
+	})
+
+	const tilesMatrix = toMatrix(tilesArray, columns)
+	const emptyTileIndex = tilesArray.indexOf(EMPTY)
 
 	const handleTileClick = (row: number, column: number) => {
-		// Temporary: verify click coordinates during scaffolding.
-		console.log('tile click', { row, column })
+		const clickedTileIndex = toIndex(row, column, columns)
+		if (clickedTileIndex === emptyTileIndex) return
+
+		const emptyTileRow = rowFromIndex(emptyTileIndex, columns)
+		const emptyTileColumn = columnFromIndex(emptyTileIndex, columns)
+
+		const isNeighbor =
+			Math.abs(row - emptyTileRow) + Math.abs(column - emptyTileColumn) === 1
+		if (!isNeighbor) return
+
+		const nextTilesArray = swapWithEmpty(
+			tilesArray,
+			clickedTileIndex,
+			emptyTileIndex,
+		)
+		setTilesArray(nextTilesArray)
 	}
 
 	return (

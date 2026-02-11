@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import Board from '../components/Board'
+import Button from '../components/Button'
 import { rows, columns } from '../config'
 
 type GameStatus = 'playing' | 'won'
@@ -101,6 +102,11 @@ function shuffleByRandomMoves(
 	return nextTilesArray
 }
 
+function createShuffledTilesArray(rows: number, columns: number): number[] {
+	const solvedTilesArray = createSolvedTilesArray(rows, columns)
+	return shuffleByRandomMoves(solvedTilesArray, rows, columns)
+}
+
 // Game rules (win condition)
 function isPuzzleSolved(tiles: number[]): boolean {
 	for (let i = 0; i < tiles.length - 1; i++) {
@@ -111,13 +117,20 @@ function isPuzzleSolved(tiles: number[]): boolean {
 
 function Puzzle() {
 	const [tilesArray, setTilesArray] = useState<number[]>(() => {
-		const solvedTilesArray = createSolvedTilesArray(rows, columns)
-		return shuffleByRandomMoves(solvedTilesArray, rows, columns)
+		return createShuffledTilesArray(rows, columns)
 	})
+
 	const [gameStatus, setGameStatus] = useState<GameStatus>('playing')
 
 	const tilesMatrix = toMatrix(tilesArray, columns)
 	const emptyTileIndex = tilesArray.indexOf(EMPTY)
+
+	const handleResetClick = () => {
+		const nextTilesArray = createShuffledTilesArray(rows, columns)
+
+		setTilesArray(nextTilesArray)
+		setGameStatus('playing')
+	}
 
 	const handleTileClick = (row: number, column: number) => {
 		if (gameStatus === 'won') return
@@ -153,10 +166,29 @@ function Puzzle() {
 				<Board tiles={tilesMatrix} onTileClick={handleTileClick} />
 			</main>
 			<footer>
-				{gameStatus === 'won' && (
-					<p className="puzzle-win" role="status">
-						du vann!
-					</p>
+				{gameStatus === 'won' ? (
+					<div className="win-container">
+						<p className="win-message" role="status">
+							du vann!
+						</p>
+						<Button
+							ariaLabel="spela igen knapp"
+							className="play-again"
+							label="spela igen"
+							onClick={handleResetClick}
+						/>
+					</div>
+				) : (
+					<div className="hud-container">
+						{/* <p>drag</p> */}
+						<Button
+							ariaLabel="slumpa knapp"
+							className="shuffle"
+							label="slumpa"
+							onClick={handleResetClick}
+						/>
+						{/* <p>tid</p> */}
+					</div>
 				)}
 			</footer>
 		</div>

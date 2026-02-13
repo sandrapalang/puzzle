@@ -5,6 +5,11 @@ import { rows, columns } from '../config'
 
 type GameStatus = 'playing' | 'won'
 
+type MoveResult = {
+	nextTilesArray: number[]
+	nextEmptyTileIndex: number
+}
+
 const EMPTY = 0
 
 // Board construction (initial state & representation)
@@ -36,16 +41,130 @@ function columnFromIndex(index: number, columns: number): number {
 	return index % columns
 }
 
-// Move logic (tile swapping and neighbor calculation)
+// Move logic (apply moves to tilesArray)
 function swapWithEmpty(
 	tilesArray: number[],
 	clickedTileIndex: number,
 	emptyTileIndex: number,
-): number[] {
+): MoveResult {
 	const nextTilesArray = [...tilesArray]
 	nextTilesArray[emptyTileIndex] = nextTilesArray[clickedTileIndex]
 	nextTilesArray[clickedTileIndex] = EMPTY
-	return nextTilesArray
+	return {
+		nextTilesArray,
+		nextEmptyTileIndex: clickedTileIndex,
+	}
+}
+
+// Multi-slide moves (shift a row/column towards the empty tile)
+function moveInRowTowardsEmpty(
+	tilesArray: number[],
+	clickedTileIndex: number,
+	emptyTileIndex: number,
+	columns: number,
+): MoveResult | null {
+	const clickedRow = rowFromIndex(clickedTileIndex, columns)
+	const emptyRow = rowFromIndex(emptyTileIndex, columns)
+
+	if (clickedRow !== emptyRow) return null
+
+	// If clicked is left of the empty tile (smaller index): shift the row right
+	// towards the empty tile.
+	//
+	// Row example: [A B _] → click A → [_ A B]
+	if (clickedTileIndex < emptyTileIndex) {
+		const nextTilesArray = [...tilesArray]
+
+		for (let i = emptyTileIndex; i > clickedTileIndex; i--) {
+			nextTilesArray[i] = nextTilesArray[i - 1]
+		}
+
+		nextTilesArray[clickedTileIndex] = EMPTY
+
+		return {
+			nextTilesArray,
+			nextEmptyTileIndex: clickedTileIndex,
+		}
+	}
+
+	// If clicked is right of the empty tile (larger index): shift the row left
+	// towards the empty tile.
+	//
+	// Row example: [_ A B] → click B → [A B _]
+	if (clickedTileIndex > emptyTileIndex) {
+		const nextTilesArray = [...tilesArray]
+
+		for (let i = emptyTileIndex; i < clickedTileIndex; i++) {
+			nextTilesArray[i] = nextTilesArray[i + 1]
+		}
+
+		nextTilesArray[clickedTileIndex] = EMPTY
+
+		return {
+			nextTilesArray,
+			nextEmptyTileIndex: clickedTileIndex,
+		}
+	}
+
+	return null
+}
+
+function moveInColumnTowardsEmpty(
+	tilesArray: number[],
+	clickedTileIndex: number,
+	emptyTileIndex: number,
+	columns: number,
+): MoveResult | null {
+	const clickedColumn = columnFromIndex(clickedTileIndex, columns)
+	const emptyColumn = columnFromIndex(emptyTileIndex, columns)
+
+	if (clickedColumn !== emptyColumn) return null
+
+	// If clicked is above the empty tile (smaller index): shift the column down
+	// towards the empty tile.
+	//
+	// Example (before → click → after):
+	// [1 2 5]             [1 2 _]
+	// [8 3 4] → click 5 → [8 3 5]
+	// [6 7 _]             [6 7 4]
+	if (clickedTileIndex < emptyTileIndex) {
+		const nextTilesArray = [...tilesArray]
+
+		for (let i = emptyTileIndex; i > clickedTileIndex; i -= columns) {
+			nextTilesArray[i] = nextTilesArray[i - columns]
+		}
+
+		nextTilesArray[clickedTileIndex] = EMPTY
+
+		return {
+			nextTilesArray,
+			nextEmptyTileIndex: clickedTileIndex,
+		}
+	}
+
+	// If clicked is below the empty tile (larger index): shift the column up
+	// towards the empty tile.
+	//
+	// Example (before → click → after):
+	// [1 _ 3]             [1 2 3]
+	// [4 2 6] → click 5 → [4 5 6]
+	// [7 5 8]             [7 _ 8]
+	if (clickedTileIndex > emptyTileIndex) {
+		const nextTilesArray = [...tilesArray]
+
+		for (let i = emptyTileIndex; i < clickedTileIndex; i += columns) {
+			nextTilesArray[i] = nextTilesArray[i + columns]
+		}
+
+		nextTilesArray[clickedTileIndex] = EMPTY
+
+		return {
+			nextTilesArray,
+			nextEmptyTileIndex: clickedTileIndex,
+		}
+	}
+
+	return null
 }
 
 function getNeighborIndices(
@@ -90,13 +209,10 @@ function shuffleByRandomMoves(
 		const randomNeighbor =
 			neighbors[Math.floor(Math.random() * neighbors.length)]
 
-		// After the swap, the empty tile ends up where the chosen neighbor was
-		nextTilesArray = swapWithEmpty(
-			nextTilesArray,
-			randomNeighbor,
-			emptyTileIndex,
-		)
-		emptyTileIndex = randomNeighbor
+		// After the move, the empty tile ends up at the chosen neighbor index
+		const result = swapWithEmpty(nextTilesArray, randomNeighbor, emptyTileIndex)
+		nextTilesArray = result.nextTilesArray
+		emptyTileIndex = result.nextEmptyTileIndex
 	}
 
 	return nextTilesArray
@@ -143,16 +259,34 @@ function Puzzle() {
 
 		const isNeighbor =
 			Math.abs(row - emptyTileRow) + Math.abs(column - emptyTileColumn) === 1
-		if (!isNeighbor) return
 
-		const nextTilesArray = swapWithEmpty(
-			tilesArray,
-			clickedTileIndex,
-			emptyTileIndex,
-		)
-		setTilesArray(nextTilesArray)
+		let result: MoveResult | null = null
 
-		if (isPuzzleSolved(nextTilesArray)) {
+		if (isNeighbor) {
+			result = swapWithEmpty(tilesArray, clickedTileIndex, emptyTileIndex)
+		} else {
+			result = moveInRowTowardsEmpty(
+				tilesArray,
+				clickedTileIndex,
+				emptyTileIndex,
+				columns,
+			)
+
+			if (!result) {
+				result = moveInColumnTowardsEmpty(
+					tilesArray,
+					clickedTileIndex,
+					emptyTileIndex,
+					columns,
+				)
+			}
+		}
+
+		if (!result) return
+
+		setTilesArray(result.nextTilesArray)
+
+		if (isPuzzleSolved(result.nextTilesArray)) {
 			setGameStatus('won')
 		}
 	}

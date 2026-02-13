@@ -237,6 +237,7 @@ function Puzzle() {
 	})
 
 	const [gameStatus, setGameStatus] = useState<GameStatus>('playing')
+	const [moves, setMoves] = useState<number>(0)
 
 	const tilesMatrix = toMatrix(tilesArray, columns)
 	const emptyTileIndex = tilesArray.indexOf(EMPTY)
@@ -246,6 +247,7 @@ function Puzzle() {
 
 		setTilesArray(nextTilesArray)
 		setGameStatus('playing')
+		setMoves(0)
 	}
 
 	const handleTileClick = (row: number, column: number) => {
@@ -285,6 +287,7 @@ function Puzzle() {
 		if (!result) return
 
 		setTilesArray(result.nextTilesArray)
+		setMoves((prevMoves) => prevMoves + 1)
 
 		if (isPuzzleSolved(result.nextTilesArray)) {
 			setGameStatus('won')
@@ -314,7 +317,9 @@ function Puzzle() {
 					</div>
 				) : (
 					<div className="hud-container">
-						{/* <p>drag</p> */}
+						<p>
+							drag: <output>{moves}</output>
+						</p>
 						<Button
 							ariaLabel="slumpa knapp"
 							className="shuffle"

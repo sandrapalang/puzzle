@@ -230,7 +230,7 @@ export function isPuzzleSolved(tiles: number[]): boolean {
 	return tiles[tiles.length - 1] === EMPTY
 }
 
-// Time helpers (formatting elapsed game time)
+// Time helpers (digital and readable time formats)
 export function formatTimeHHMMSS(totalSeconds: number): string {
 	const hours = Math.floor(totalSeconds / 3600)
 	const minutes = Math.floor((totalSeconds % 3600) / 60)
@@ -238,4 +238,29 @@ export function formatTimeHHMMSS(totalSeconds: number): string {
 
 	const pad2 = (n: number) => String(n).padStart(2, '0')
 	return `${pad2(hours)}:${pad2(minutes)}:${pad2(seconds)}`
+}
+
+export function formatReadableTime(totalSeconds: number): string {
+	const seconds = totalSeconds % 60
+	const minutes = Math.floor((totalSeconds / 60) % 60)
+	const hours = Math.floor(totalSeconds / 3600)
+
+	const parts: string[] = []
+
+	if (hours > 0) {
+		parts.push(`${hours} ${hours === 1 ? 'timme' : 'timmar'}`)
+	}
+
+	if (minutes > 0) {
+		parts.push(`${minutes} ${minutes === 1 ? 'minut' : 'minuter'}`)
+	}
+
+	if (seconds > 0 || parts.length === 0) {
+		parts.push(`${seconds} ${seconds === 1 ? 'sekund' : 'sekunder'}`)
+	}
+
+	if (parts.length === 1) return parts[0]
+	if (parts.length === 2) return `${parts[0]} och ${parts[1]}`
+
+	return `${parts.slice(0, -1).join(', ')} och ${parts[parts.length - 1]}`
 }

@@ -7,6 +7,7 @@ import {
 	EMPTY,
 	columnFromIndex,
 	createShuffledTilesArray,
+	formatReadableTime,
 	formatTimeHHMMSS,
 	isPuzzleSolved,
 	moveInColumnTowardsEmpty,
@@ -113,7 +114,8 @@ function Puzzle() {
 				{gameStatus === 'won' ? (
 					<div className="win-container">
 						<p className="win-message" role="status">
-							du vann!
+							Grattis! Du klarade pusslet på <output>{moves}</output> drag och{' '}
+							<output>{formatReadableTime(elapsedSeconds)}</output>.
 						</p>
 						<Button
 							ariaLabel="spela igen knapp"

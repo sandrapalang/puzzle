@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import Board from '../components/Board'
 import Button from '../components/Button'
 import { rows, columns } from '../config'
@@ -7,6 +7,7 @@ import {
 	EMPTY,
 	columnFromIndex,
 	createShuffledTilesArray,
+	formatTimeHHMMSS,
 	isPuzzleSolved,
 	moveInColumnTowardsEmpty,
 	moveInRowTowardsEmpty,
@@ -25,6 +26,8 @@ function Puzzle() {
 
 	const [gameStatus, setGameStatus] = useState<GameStatus>('playing')
 	const [moves, setMoves] = useState<number>(0)
+	const [startTimestampMs, setStartTimestampMs] = useState<number | null>(null)
+	const [elapsedSeconds, setElapsedSeconds] = useState<number>(0)
 
 	const tilesMatrix = toMatrix(tilesArray, columns)
 	const emptyTileIndex = tilesArray.indexOf(EMPTY)
@@ -35,6 +38,8 @@ function Puzzle() {
 		setTilesArray(nextTilesArray)
 		setGameStatus('playing')
 		setMoves(0)
+		setStartTimestampMs(null)
+		setElapsedSeconds(0)
 	}
 
 	const handleTileClick = (row: number, column: number) => {
@@ -73,6 +78,10 @@ function Puzzle() {
 
 		if (!result) return
 
+		if (startTimestampMs === null) {
+			setStartTimestampMs(Date.now())
+		}
+
 		setTilesArray(result.nextTilesArray)
 		setMoves((prevMoves) => prevMoves + 1)
 
@@ -80,6 +89,17 @@ function Puzzle() {
 			setGameStatus('won')
 		}
 	}
+
+	useEffect(() => {
+		if (gameStatus !== 'playing') return
+		if (startTimestampMs === null) return
+
+		const intervalId = window.setInterval(() => {
+			setElapsedSeconds(Math.floor((Date.now() - startTimestampMs) / 1000))
+		}, 1000)
+
+		return () => window.clearInterval(intervalId)
+	}, [gameStatus, startTimestampMs])
 
 	return (
 		<div className="puzzle">
@@ -113,7 +133,9 @@ function Puzzle() {
 							label="slumpa"
 							onClick={handleResetClick}
 						/>
-						{/* <p>tid</p> */}
+						<p>
+							<output>{formatTimeHHMMSS(elapsedSeconds)}</output>
+						</p>
 					</div>
 				)}
 			</footer>

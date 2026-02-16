@@ -229,3 +229,13 @@ export function isPuzzleSolved(tiles: number[]): boolean {
 	}
 	return tiles[tiles.length - 1] === EMPTY
 }
+
+// Time helpers (formatting elapsed game time)
+export function formatTimeHHMMSS(totalSeconds: number): string {
+	const hours = Math.floor(totalSeconds / 3600)
+	const minutes = Math.floor((totalSeconds % 3600) / 60)
+	const seconds = totalSeconds % 60
+
+	const pad2 = (n: number) => String(n).padStart(2, '0')
+	return `${pad2(hours)}:${pad2(minutes)}:${pad2(seconds)}`
+}
